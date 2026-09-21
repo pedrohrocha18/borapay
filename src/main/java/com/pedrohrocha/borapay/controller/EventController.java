@@ -1,10 +1,6 @@
 package com.pedrohrocha.borapay.controller;
 
-import com.pedrohrocha.borapay.dto.ApiResponse;
-import com.pedrohrocha.borapay.dto.CreateEventRequestDto;
-import com.pedrohrocha.borapay.dto.EventResponseDto;
-import com.pedrohrocha.borapay.dto.UpdateEventRequestDto;
-import com.pedrohrocha.borapay.entity.Event;
+import com.pedrohrocha.borapay.dto.*;
 import com.pedrohrocha.borapay.service.EventService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -45,11 +41,20 @@ public class EventController {
                 .body(ApiResponse.success("Event updated", response));
     }
 
+    @PatchMapping("/{id}/status")
+    public ResponseEntity<ApiResponse<EventResponseDto>> updateEventStatus(@PathVariable UUID id, @Valid @RequestBody UpdateEventStatusRequestDto status) {
+        EventResponseDto response = eventService.updateEventStatus(id, status);
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(ApiResponse.success("Event status updated", response));
+    }
+
+
     @PostMapping
     public ResponseEntity<ApiResponse<EventResponseDto>> createEvent(@Valid @RequestBody CreateEventRequestDto request) {
         EventResponseDto response = eventService.create(request);
 
-        return ResponseEntity.status(HttpStatus.OK)
+        return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Event created successfully", response));
     }
 }

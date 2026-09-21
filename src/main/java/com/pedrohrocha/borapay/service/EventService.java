@@ -3,8 +3,10 @@ package com.pedrohrocha.borapay.service;
 import com.pedrohrocha.borapay.dto.CreateEventRequestDto;
 import com.pedrohrocha.borapay.dto.EventResponseDto;
 import com.pedrohrocha.borapay.dto.UpdateEventRequestDto;
+import com.pedrohrocha.borapay.dto.UpdateEventStatusRequestDto;
 import com.pedrohrocha.borapay.entity.Event;
 import com.pedrohrocha.borapay.enums.EventStatus;
+import com.pedrohrocha.borapay.exception.EventCanceledException;
 import com.pedrohrocha.borapay.exception.EventNotFoundException;
 import com.pedrohrocha.borapay.exception.InvalidEventPeriodException;
 import com.pedrohrocha.borapay.repository.EventRepository;
@@ -41,6 +43,21 @@ public class EventService {
             throw new InvalidEventPeriodException();
         }
 
+        eventRepository.save(event);
+
+        return toResponse(event);
+    }
+
+    public EventResponseDto updateEventStatus(UUID id, UpdateEventStatusRequestDto updateEventStatusRequestDto) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(EventNotFoundException::new);
+
+        if (event.getStatus() == EventStatus.CANCELED
+                && updateEventStatusRequestDto.status() != EventStatus.CANCELED) {
+            throw new EventCanceledException();
+        }
+
+        event.setStatus(updateEventStatusRequestDto.status());
         eventRepository.save(event);
 
         return toResponse(event);

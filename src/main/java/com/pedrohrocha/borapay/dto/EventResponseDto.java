@@ -6,12 +6,12 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record EventResponseDto(
-        UUID id,
+        UUID eventId,
         String title,
         String description,
         String location,
-        LocalDateTime startDateTime,
-        LocalDateTime endDateTime,
-        EventStatus status
+        LocalDateTime startTime,
+        LocalDateTime endTime,
+        EventStatus eventStatus
 ) {
 }

@@ -2,20 +2,14 @@ package com.pedrohrocha.borapay.service;
 
 import com.pedrohrocha.borapay.dto.CreateEventRequestDto;
 import com.pedrohrocha.borapay.dto.EventResponseDto;
-import com.pedrohrocha.borapay.dto.UpdateEventRequestDto;
-import com.pedrohrocha.borapay.dto.UpdateEventStatusRequestDto;
-import com.pedrohrocha.borapay.entity.Event;
 import com.pedrohrocha.borapay.enums.EventStatus;
-import com.pedrohrocha.borapay.exception.EventCanceledException;
-import com.pedrohrocha.borapay.exception.EventNotFoundException;
+import com.pedrohrocha.borapay.event.entity.Event;
 import com.pedrohrocha.borapay.exception.InvalidEventPeriodException;
 import com.pedrohrocha.borapay.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -23,89 +17,39 @@ import java.util.UUID;
 public class EventService {
     private final EventRepository eventRepository;
 
-    public EventResponseDto updateEvent(UUID id, UpdateEventRequestDto updateEventRequestDto) {
-        boolean titleIsNotNull = updateEventRequestDto.title() != null;
-        boolean descriptionIsNotNull = updateEventRequestDto.description() != null;
-        boolean locationIsNotNull = updateEventRequestDto.location() != null;
-        boolean startDateTimeIsNotNull = updateEventRequestDto.startDateTime() != null;
-        boolean endDateTimeIsNotNull = updateEventRequestDto.endDateTime() != null;
-
-        Event event = eventRepository.findById(id)
-                .orElseThrow(EventNotFoundException::new);
-
-        if (titleIsNotNull) event.setTitle(updateEventRequestDto.title());
-        if (descriptionIsNotNull) event.setDescription(updateEventRequestDto.description());
-        if (locationIsNotNull) event.setLocation(updateEventRequestDto.location());
-        if (startDateTimeIsNotNull) event.setStartDateTime(updateEventRequestDto.startDateTime());
-        if (endDateTimeIsNotNull) event.setEndDateTime(updateEventRequestDto.endDateTime());
-
-        if (!event.getEndDateTime().isAfter(event.getStartDateTime())) {
+    public EventResponseDto create(CreateEventRequestDto request) {
+        if (!request.endTime().isAfter(request.startTime())) {
             throw new InvalidEventPeriodException();
         }
 
-        eventRepository.save(event);
-
-        return toResponse(event);
-    }
-
-    public EventResponseDto updateEventStatus(UUID id, UpdateEventStatusRequestDto updateEventStatusRequestDto) {
-        Event event = eventRepository.findById(id)
-                .orElseThrow(EventNotFoundException::new);
-
-        if (event.getStatus() == EventStatus.CANCELED
-                && updateEventStatusRequestDto.status() != EventStatus.CANCELED) {
-            throw new EventCanceledException();
-        }
-
-        event.setStatus(updateEventStatusRequestDto.status());
-        eventRepository.save(event);
-
-        return toResponse(event);
-    }
-
-    public List<EventResponseDto> findAllEvents() {
-        return eventRepository.findAll()
-                .stream()
-                .map(this::toResponse)
-                .toList();
-    }
-
-    public EventResponseDto findEventById(UUID id) {
-        Event event = eventRepository.findById(id)
-                .orElseThrow(EventNotFoundException::new);
-
-        return toResponse(event);
-    }
-
-    public EventResponseDto create(CreateEventRequestDto createEventRequestDto) {
-        Event event = new Event();
-
-        event.setTitle(createEventRequestDto.title());
-        event.setDescription(createEventRequestDto.description());
-        event.setLocation(createEventRequestDto.location());
-        event.setStartDateTime(createEventRequestDto.startDateTime());
-        event.setEndDateTime(createEventRequestDto.endDateTime());
-        event.setStatus(EventStatus.INACTIVE);
-
-        if (!createEventRequestDto.endDateTime()
-                .isAfter(createEventRequestDto.startDateTime())) {
-            throw new InvalidEventPeriodException();
-        }
+        Event event = toEntity(request);
 
         Event savedEvent = eventRepository.save(event);
 
-        return toResponse(savedEvent);
+        return toDto(savedEvent);
     }
 
-    private EventResponseDto toResponse(Event event) {
+    private Event toEntity(CreateEventRequestDto request) {
+        return new Event(
+                null,
+                request.title(),
+                request.description(),
+                request.location(),
+                request.startTime(),
+                request.endTime(),
+                EventStatus.PENDING
+        );
+    }
+
+    private EventResponseDto toDto(Event event) {
         return new EventResponseDto(
                 event.getId(),
                 event.getTitle(),
                 event.getDescription(),
                 event.getLocation(),
-                event.getStartDateTime(),
-                event.getEndDateTime(),
-                event.getStatus()
+                event.getStartTime(),
+                event.getEndTime(),
+                event.getEventStatus()
         );
     }
 }

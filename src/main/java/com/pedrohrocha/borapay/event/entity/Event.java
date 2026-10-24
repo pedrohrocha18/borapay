@@ -1,4 +1,4 @@
-package com.pedrohrocha.borapay.entity;
+package com.pedrohrocha.borapay.event.entity;
 
 import com.pedrohrocha.borapay.enums.EventStatus;
 import jakarta.persistence.*;
@@ -10,32 +10,33 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
-@Entity
-@Table(name = "events")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
+@NoArgsConstructor
+@Entity
+@Table(name = "events")
 public class Event {
-    @GeneratedValue(strategy = GenerationType.UUID)
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String title;
 
+    @Column(length = 255)
     private String description;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String location;
 
     @Column(nullable = false)
-    private LocalDateTime startDateTime;
+    private LocalDateTime startTime;
 
     @Column(nullable = false)
-    private LocalDateTime endDateTime;
+    private LocalDateTime endTime;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 30)
-    private EventStatus status;
+    @Column(nullable = false)
+    private EventStatus eventStatus;
 }

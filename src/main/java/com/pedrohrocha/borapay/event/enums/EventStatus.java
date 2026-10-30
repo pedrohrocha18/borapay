@@ -1,4 +1,4 @@
-package com.pedrohrocha.borapay.enums;
+package com.pedrohrocha.borapay.event.enums;
 
 public enum EventStatus {
     PENDING,

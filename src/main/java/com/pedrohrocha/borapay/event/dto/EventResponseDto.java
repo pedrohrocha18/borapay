@@ -1,6 +1,6 @@
-package com.pedrohrocha.borapay.dto;
+package com.pedrohrocha.borapay.event.dto;
 
-import com.pedrohrocha.borapay.enums.EventStatus;
+import com.pedrohrocha.borapay.event.enums.EventStatus;
 
 import java.time.LocalDateTime;
 import java.util.UUID;

@@ -1,6 +1,4 @@
-package com.pedrohrocha.borapay.exception;
-
-import com.pedrohrocha.borapay.enums.EventStatus;
+package com.pedrohrocha.borapay.event.exception;
 
 public class InvalidEventPeriodException extends RuntimeException {
     public InvalidEventPeriodException() {

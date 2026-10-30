@@ -1,6 +1,6 @@
 package com.pedrohrocha.borapay.event.entity;
 
-import com.pedrohrocha.borapay.enums.EventStatus;
+import com.pedrohrocha.borapay.event.enums.EventStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
